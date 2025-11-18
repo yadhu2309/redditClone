@@ -3,7 +3,7 @@ from .models import Posts, Comments
 from rest_framework import viewsets
 
 class PostViewSet(viewsets.ModelViewSet):
-    queryset = Posts.objects.all()
+    queryset = Posts.objects.all().prefetch_related('comments')
     serializer_class = PostSerializer
 
 class CommentViewSet(viewsets.ModelViewSet):

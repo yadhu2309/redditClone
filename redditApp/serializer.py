@@ -7,18 +7,22 @@ class RecursiveField(Serializer):
         return serializer.data
 
 class CommentSerializer(ModelSerializer):
-    replies = RecursiveField(many=True, read_only=True) 
+    replies = SerializerMethodField()
     class Meta:
         model = Comments
         fields = '__all__'
+    def get_replies(self, obj):
+        return CommentSerializer(obj.get_children(), many=True).data
 
 class PostSerializer(ModelSerializer):
-    comments = SerializerMethodField()
+    comments =CommentSerializer()
     class Meta:
         model = Posts
         fields = '__all__'
-
     def get_comments(self, obj):
-        # return only top-level comments (parent = None)
-        top_level_comments = obj.comments.filter(comment__isnull=True)
-        return CommentSerializer(top_level_comments, many=True).data
+        return CommentSerializer(obj.comments.filter(parent__isNull=True), many=True).data
+
+    # def get_comments(self, obj):
+    #     # return only top-level comments (parent = None)
+    #     top_level_comments = obj.comments.filter(comment__isnull=True)
+    #     return CommentSerializer(top_level_comments, many=True).data

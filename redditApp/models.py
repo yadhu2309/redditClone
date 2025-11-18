@@ -1,5 +1,5 @@
 from django.db import models
-
+from mptt.models import MPTTModel, TreeForeignKey
 # Create your models here.
 
 class Posts(models.Model):
@@ -12,12 +12,15 @@ class Posts(models.Model):
     def __str__(self):
         return self.title
     
-class Comments(models.Model):
-    comment = models.ForeignKey('self', null=True, blank=True, related_name='replies', on_delete=models.CASCADE)
+class Comments(MPTTModel):
+    comment = TreeForeignKey('self', null=True, blank=True, related_name='replies', on_delete=models.CASCADE)
     post = models.ForeignKey(Posts, related_name='comments', on_delete=models.CASCADE)
     author = models.CharField(max_length=100)
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+    
+    class MPTTMeta:
+        order_insertion_by = ['created_at']
 
     def __str__(self):
         return f'Comment by {self.author} on {self.post.title}'
