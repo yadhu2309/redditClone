@@ -13,12 +13,12 @@ class Posts(models.Model):
         return self.title
     
 class Comments(MPTTModel):
-    comment = TreeForeignKey('self', null=True, blank=True, related_name='replies', on_delete=models.CASCADE)
+    parent = TreeForeignKey('self', null=True, blank=True, related_name='children', on_delete=models.CASCADE)
     post = models.ForeignKey(Posts, related_name='comments', on_delete=models.CASCADE)
     author = models.CharField(max_length=100)
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
-    
+
     class MPTTMeta:
         order_insertion_by = ['created_at']
 
